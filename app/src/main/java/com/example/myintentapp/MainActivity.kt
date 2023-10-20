@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -14,7 +16,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
    private lateinit var btnMoveData:Button
    private lateinit var btnMoveObject:Button
    private lateinit var btnDial:Button
-
+   private lateinit var tvResult:TextView
+   private lateinit var btnMoveForResult:Button
+   private val resultLauncher = registerForActivityResult(
+       ActivityResultContracts.StartActivityForResult()
+   ) { result ->
+       if (result.resultCode == MainActivity5.RESULT_CODE && result.data != null) {
+           val selectedValue =
+               result.data?.getIntExtra(MainActivity5.EXTRA_SELECTED_VALUE, 0)
+           tvResult.text = "hasil : $selectedValue"
+       }
+   }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +40,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnMoveObject.setOnClickListener(this)
         btnDial = findViewById(R.id.btnDialNumber)
         btnDial.setOnClickListener(this)
-
+        btnMoveForResult = findViewById(R.id.btn_move_for_result)
+        btnMoveForResult.setOnClickListener(this)
+        tvResult = findViewById(R.id.tv_result)
 
     }
 
@@ -60,6 +74,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val phoneNumber = "087273812311"
                 val dialPhoneIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNumber"))
                 startActivity(dialPhoneIntent)
+            }
+            R.id.btn_move_for_result -> {
+                val moveForResultIntent = Intent(this@MainActivity, MainActivity5::class.java)
+                resultLauncher.launch(moveForResultIntent)
             }
         }
     }
